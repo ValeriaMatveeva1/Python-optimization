@@ -112,7 +112,7 @@ def determinant(A):
     return det
 
 
-def integrate(a: float, b: float):
+def integrate_py(a: float, b: float):
     n = 500000
     h = (b - a) / float(n)
     total = sum(math.sin((a + (k * h))) for k in range(0, n))
@@ -136,5 +136,5 @@ def interpolate_in_point(x: list, y: list, t: int):
     return z
 
 
-def interpolate(x: list, y: list, x_new: list):
+def interpolate_py(x: list, y: list, x_new: list):
     return [interpolate_in_point(x, y, i) for i in x_new]

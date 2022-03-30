@@ -137,35 +137,35 @@ def determinant(A: np.array):
 
 
 @njit
-def integrate(a, b):
+def integrate_py(a, b):
     n = 1000000
     total = 0
     h = (b - a) / float(n)
     for k in range(0, n):
-        total += math.sin(a+(k*h))
+        total += math.sin(a + (k * h))
     result = h * total
     return result
 
 
 @njit
 def interpolate_in_point(x: np.array, y: np.array, t):
-    z = 0
+    z = 0.0
     for j in range(y.shape[0]):
-        p1 = 1
-        p2 = 1
+        p1 = 1.0
+        p2 = 1.0
         for i in range(x.shape[0]):
             if i == j:
-                p1 = p1 * 1
-                p2 = p2 * 1
+                p1 = p1 * 1.0
+                p2 = p2 * 1.0
             else:
                 p1 = p1 * (t - x[i])
                 p2 = p2 * (x[j] - x[i])
-        z = z + y[j] * p1 / p2
+        z += y[j] * p1 / p2
     return z
 
 
 @njit
-def interpolate(x: np.array, y: np.array, x_new: np.array):
+def interpolate_py(x: np.array, y: np.array, x_new: np.array):
     result = np.zeros(x_new.shape[0])
     for i in range(x_new.shape[0]):
         result[i] = interpolate_in_point(x, y, x_new[i])

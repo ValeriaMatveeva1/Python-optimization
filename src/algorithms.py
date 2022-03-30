@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import math
+from scipy import integrate, interpolate, linalg
 
 
 def prime_q(n: int):
@@ -133,12 +134,21 @@ def determinant(A):
     return det
 
 
-def integrate(a: float, b: float):
+def determinant_numpy(A):
+    return linalg.det(A)
+
+
+def integrate_py(a: float, b: float):
     n = 500000
     h = (b - a) / float(n)
     total = sum(math.sin((a + (k * h))) for k in range(0, n))
     result = h * total
     return result
+
+
+def integrate_numpy(a, b):
+    f = lambda x: math.sin(x)
+    return integrate.quad(f, a, b)
 
 
 def interpolate_in_point(x: list, y: list, t: int):
@@ -157,5 +167,10 @@ def interpolate_in_point(x: list, y: list, t: int):
     return z
 
 
-def interpolate(x: list, y: list, x_new: list):
+def interpolate_py(x: list, y: list, x_new: list):
     return [interpolate_in_point(x, y, i) for i in x_new]
+
+
+def interpolate_numpy(x, y, x_new):
+    f = interpolate.interp1d(x, y)
+    return f(x_new)
