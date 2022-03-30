@@ -2,7 +2,7 @@ import math
 import random
 
 
-def prime_q(n):
+def prime_q(n: int):
     if n <= 1:
         return False
     i = 2
@@ -13,7 +13,7 @@ def prime_q(n):
     return True
 
 
-def find_primes(n):
+def find_primes(n: int):
     a = []
     for i in range(n + 1):
         if prime_q(i):
@@ -21,11 +21,11 @@ def find_primes(n):
     return a
 
 
-def generate_rand_matrix(n):
+def generate_rand_matrix(n: int):
     return [[random.random() for i in range(n)] for j in range(n)]
 
 
-def matrix_mul(a, b):
+def matrix_mul(a: list, b: list):
     n = len(a)
     c: list = [[0] * n for _ in range(n)]
     for i in range(n):
@@ -43,7 +43,7 @@ def linspace(min, max, step):
         min += h
 
 
-def mandelbrot_set(wh):
+def mandelbrot_set(wh: int):
     pmin, pmax, qmin, qmax = -2.5, 1.5, -2, 2
     ppoints, qpoints = wh, wh
     max_iterations = 100
@@ -60,7 +60,7 @@ def mandelbrot_set(wh):
     return image
 
 
-def jordan_method_py(a, f) -> None:
+def jordan_method_py(a: list, f: list):
     n = len(a)
     for i in range(0, n):
         k = i
@@ -87,3 +87,54 @@ def jordan_method_py(a, f) -> None:
                 f[j][t] -= f[i][t] * a[j][i]
             for t in range(n - 1, i - 1, -1):
                 a[j][t] -= a[i][t] * a[j][i]
+
+def determinant(A):
+    eps = 1e-9
+    n = len(A)
+    det = 1
+    for i in range(n):
+        k = i
+        for j in range(i + 1, n):
+            if abs(A[j][i]) > abs(A[k][i]):
+                k = j
+        if abs(A[k][i]) < eps:
+            return 0
+        A[i], A[k] = A[k], A[i]
+        if i != k:
+            det = -det
+        det *= A[i][i]
+        for j in range(i + 1, n):
+            A[i][j] /= A[i][i]
+        for j in range(n):
+            if j != i and abs(A[j][i]) > eps:
+                for t in range(i + 1, n):
+                    A[j][t] -= A[i][t] * A[j][i]
+    return det
+
+
+def integrate(a: float, b: float):
+    n = 500000
+    h = (b - a) / float(n)
+    total = sum(math.sin((a + (k * h))) for k in range(0, n))
+    result = h * total
+    return result
+
+
+def interpolate_in_point(x: list, y: list, t: int):
+    z = 0
+    for j in range(len(y)):
+        p1 = 1
+        p2 = 1
+        for i in range(len(x)):
+            if i == j:
+                p1 = p1 * 1
+                p2 = p2 * 1
+            else:
+                p1 = p1 * (t - x[i])
+                p2 = p2 * (x[j] - x[i])
+        z = z + y[j] * p1 / p2
+    return z
+
+
+def interpolate(x: list, y: list, x_new: list):
+    return [interpolate_in_point(x, y, i) for i in x_new]

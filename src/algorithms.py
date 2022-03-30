@@ -159,5 +159,3 @@ def interpolate_in_point(x: list, y: list, t: int):
 
 def interpolate(x: list, y: list, x_new: list):
     return [interpolate_in_point(x, y, i) for i in x_new]
-
-print(determinant([[1,2,3],[0,-7,-3],[9,-8,2]]))
