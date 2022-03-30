@@ -109,14 +109,27 @@ def jordan_method_numpy(A: np.array, r: np.array):
     return r
 
 
-def determinant(A: list):
-    size = len(A)
+def determinant(A):
+    eps = 1e-9
+    n = len(A)
     det = 1
-    for i in range(size - 1):
-        for j in range(i + 1, size):
-            A[j] = [n - m * A[j][i] / A[i][i] for n, m in zip(A[j], A[i])]
-    for k in range(size):
-        det *= A[k][k]
+    for i in range(n):
+        k = i
+        for j in range(i + 1, n):
+            if abs(A[j][i]) > abs(A[k][i]):
+                k = j
+        if abs(A[k][i]) < eps:
+            return 0
+        A[i], A[k] = A[k], A[i]
+        if i != k:
+            det = -det
+        det *= A[i][i]
+        for j in range(i + 1, n):
+            A[i][j] /= A[i][i]
+        for j in range(n):
+            if j != i and abs(A[j][i]) > eps:
+                for t in range(i + 1, n):
+                    A[j][t] -= A[i][t] * A[j][i]
     return det
 
 
@@ -146,3 +159,5 @@ def interpolate_in_point(x: list, y: list, t: int):
 
 def interpolate(x: list, y: list, x_new: list):
     return [interpolate_in_point(x, y, i) for i in x_new]
+
+print(determinant([[1,2,3],[0,-7,-3],[9,-8,2]]))

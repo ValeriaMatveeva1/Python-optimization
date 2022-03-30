@@ -62,7 +62,7 @@ def mandelbrot_set(wh):
 
 
 @njit
-def jordan_method_py(a: np.array, f: np.array) -> None:
+def jordan_method_py(a: np.array, f: np.array):
     n = a.shape[0]
     for i in range(0, n):
         k = i
@@ -106,3 +106,67 @@ def jordan_method_numpy(a: np.array, r: np.array):
             r[k] = r[k] - r[i] * a[k, i]
             a[k] = a[k] - a[i] * a[k, i]
     return r
+
+
+@njit
+def determinant(A: np.array):
+    eps = 1e-9
+    n = A.shape[0]
+    det = 1
+    for i in range(0, n):
+        k = i
+        for j in range(i + 1, n):
+            if abs(A[j, i]) > abs(A[k, i]):
+                k = j
+        if abs(A[k, i]) < eps:
+            return 0
+        for t in range(n):
+            g = A[i][t]
+            A[i][t] = A[k][t]
+            A[k][t] = g
+        if i != k:
+            det = -det
+        det *= A[i, i]
+        for j in range(i + 1, n):
+            A[i, j] /= A[i, i]
+        for j in range(0, n):
+            if j != i and abs(A[j, i]) > eps:
+                for k in range(i + 1, n):
+                    A[j, k] -= A[i, k] * A[j, i]
+    return det
+
+
+@njit
+def integrate(a, b):
+    n = 1000000
+    total = 0
+    h = (b - a) / float(n)
+    for k in range(0, n):
+        total += math.sin(a+(k*h))
+    result = h * total
+    return result
+
+
+@njit
+def interpolate_in_point(x: np.array, y: np.array, t):
+    z = 0
+    for j in range(y.shape[0]):
+        p1 = 1
+        p2 = 1
+        for i in range(x.shape[0]):
+            if i == j:
+                p1 = p1 * 1
+                p2 = p2 * 1
+            else:
+                p1 = p1 * (t - x[i])
+                p2 = p2 * (x[j] - x[i])
+        z = z + y[j] * p1 / p2
+    return z
+
+
+@njit
+def interpolate(x: np.array, y: np.array, x_new: np.array):
+    result = np.zeros(x_new.shape[0])
+    for i in range(x_new.shape[0]):
+        result[i] = interpolate_in_point(x, y, x_new[i])
+    return result
