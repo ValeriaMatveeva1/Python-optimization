@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import math
 
 
 def prime_q(n):
@@ -106,3 +107,42 @@ def jordan_method_numpy(A: np.array, r: np.array) -> np.array:
             r[k] = r[k] - r[i] * A[k, i]
             A[k] = A[k] - A[i] * A[k, i]
     return r
+
+
+def determinant(A: list) -> int:
+    size = len(A)
+    det = 1
+    for i in range(size - 1):
+        for j in range(i + 1, size):
+            A[j] = [n - m * A[j][i] / A[i][i] for n, m in zip(A[j], A[i])]
+    for k in range(size):
+        det *= A[k][k]
+    return det
+
+
+def integrate(a: float, b: float) -> float:
+    n = 500000
+    h = (b - a) / float(n)
+    total = sum(math.sin((a + (k * h))) for k in range(0, n))
+    result = h * total
+    return result
+
+
+def interpolate_in_point(x: list, y: list, t: int):
+    z = 0
+    for j in range(len(y)):
+        p1 = 1
+        p2 = 1
+        for i in range(len(x)):
+            if i == j:
+                p1 = p1 * 1
+                p2 = p2 * 1
+            else:
+                p1 = p1 * (t - x[i])
+                p2 = p2 * (x[j] - x[i])
+        z = z + y[j] * p1 / p2
+    return z
+
+
+def interpolate(x: list, y: list, x_new: list):
+    return [interpolate_in_point(x, y, i) for i in x_new]
