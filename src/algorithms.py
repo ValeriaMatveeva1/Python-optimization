@@ -3,7 +3,7 @@ import numpy as np
 import math
 
 
-def prime_q(n):
+def prime_q(n: int):
     if n <= 1:
         return False
     i = 2
@@ -14,7 +14,7 @@ def prime_q(n):
     return True
 
 
-def find_primes(n):
+def find_primes(n: int):
     a = []
     for i in range(n + 1):
         if prime_q(i):
@@ -22,15 +22,15 @@ def find_primes(n):
     return a
 
 
-def generate_rand_matrix_1(n):
+def generate_rand_matrix_1(n: int):
     return [[random.random() for i in range(n)] for j in range(n)]
 
 
-def generate_rand_matrix_2(n):
+def generate_rand_matrix_2(n: int):
     return np.random.uniform(size=(n, n))
 
 
-def matrix_mul_py(a, b):
+def matrix_mul_py(a: list, b: list):
     n = len(a)
     c: list = [[0] * n for _ in range(n)]
     for i in range(n):
@@ -40,14 +40,14 @@ def matrix_mul_py(a, b):
     return c
 
 
-def matrix_mul_numpy(a, b):
+def matrix_mul_numpy(a: np.array, b: np.array):
     n = a.shape[0]
     if n != a.shape[1] or n != b.shape[0] or n != b.shape[1]:
         return None
     return np.matmul(a, b)
 
 
-def mandelbrot_set(wh):
+def mandelbrot_set(wh: int):
     pmin, pmax, qmin, qmax = -2.5, 1.5, -2, 2
     ppoints, qpoints = wh, wh
     max_iterations = 100
@@ -64,7 +64,7 @@ def mandelbrot_set(wh):
     return image
 
 
-def jordan_method_py(a, f) -> None:
+def jordan_method_py(a: list, f: list):
     n = len(a)
     for i in range(0, n):
         k = i
@@ -95,7 +95,7 @@ def jordan_method_py(a, f) -> None:
     return f
 
 
-def jordan_method_numpy(A: np.array, r: np.array) -> np.array:
+def jordan_method_numpy(A: np.array, r: np.array):
     size: int = A.shape[0]
     for i in range(0, size):
         r[i] = r[i] / A[i, i]
@@ -109,7 +109,7 @@ def jordan_method_numpy(A: np.array, r: np.array) -> np.array:
     return r
 
 
-def determinant(A: list) -> int:
+def determinant(A: list):
     size = len(A)
     det = 1
     for i in range(size - 1):
@@ -120,7 +120,7 @@ def determinant(A: list) -> int:
     return det
 
 
-def integrate(a: float, b: float) -> float:
+def integrate(a: float, b: float):
     n = 500000
     h = (b - a) / float(n)
     total = sum(math.sin((a + (k * h))) for k in range(0, n))
