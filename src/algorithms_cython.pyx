@@ -1,11 +1,11 @@
 import math
 import random
+import numpy as np
 
-
-def prime_q(n: int):
+cpdef int prime_q(int n):
     if n <= 1:
         return False
-    i = 2
+    cdef i = 2
     while i * i <= n:
         if n % i == 0:
             return False
@@ -13,16 +13,17 @@ def prime_q(n: int):
     return True
 
 
-def find_primes(n: int):
-    a = []
+cpdef int[:] find_primes(int n):
+    cdef int[:] a = np.zeros(n+1, dtype=np.int32)
+    cdef int i
     for i in range(n + 1):
-        if prime_q(i):
-            a.append(i)
+        a[i] = prime_q(i)
     return a
 
 
-def generate_rand_matrix(n: int):
-    return [[random.random() for i in range(n)] for j in range(n)]
+def generate_rand_matrix(int n):
+    cdef double[:,:] a = np.random.uniform(size=(n, n))
+    return a
 
 
 def matrix_mul(a: list, b: list):
@@ -88,27 +89,29 @@ def jordan_method_py(a: list, f: list):
             for t in range(n - 1, i - 1, -1):
                 a[j][t] -= a[i][t] * a[j][i]
 
-def determinant(A):
-    eps = 1e-9
-    n = len(A)
-    det = 1
+
+cpdef double determinant(double[:,:] A) except? 0:
+    cdef double eps = 1e-9
+    cdef int n = A.shape[0]
+    cdef double det = 1
+    cdef int i, j, k
     for i in range(n):
         k = i
         for j in range(i + 1, n):
-            if abs(A[j][i]) > abs(A[k][i]):
+            if abs(A[j,i]) > abs(A[k,i]):
                 k = j
-        if abs(A[k][i]) < eps:
+        if abs(A[k,i]) < eps:
             return 0
         A[i], A[k] = A[k], A[i]
         if i != k:
             det = -det
-        det *= A[i][i]
+        det *= A[i,i]
         for j in range(i + 1, n):
-            A[i][j] /= A[i][i]
+            A[i,j] /= A[i,i]
         for j in range(n):
-            if j != i and abs(A[j][i]) > eps:
+            if j != i and abs(A[j,i]) > eps:
                 for t in range(i + 1, n):
-                    A[j][t] -= A[i][t] * A[j][i]
+                    A[j,t] -= A[i,t] * A[j,i]
     return det
 
 

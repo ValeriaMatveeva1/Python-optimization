@@ -262,6 +262,6 @@ def mean(name, new_name):
 # write_tests("data/interpolation.csv", [test_7_1, test_7_2, test_7_3, test_7_4], 2, 150)
 # write_tests("data/matrix_mul.csv", [test_1_1, test_1_2, test_1_3, test_1_4], 1, 150)
 # write_tests("data/mandelbrot_set.csv", [test_2_1, test_2_2, test_2_3], 1, 150)
-# write_tests("data/find_primes.csv", [test_3_1, test_3_2, test_3_3], 10000, 11000)
+write_tests("data/find_primes.csv", [test_3_1, test_3_2, test_3_3], 1, 2000)
 # write_tests("data/jordan_method.csv", [test_4_1, test_4_2, test_4_3, test_4_4], 1, 100)
 # mean("data/find_primes_o.csv", "data/find_primes.csv")
