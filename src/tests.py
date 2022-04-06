@@ -116,8 +116,8 @@ def test_4_3(n):
 
 # метод жордана (cython реализация)
 def test_4_4(n):
-    a = al.generate_rand_matrix_1(n)
-    b = al.generate_rand_matrix_1(n)
+    a = alc.generate_rand_matrix(n)
+    b = alc.generate_rand_matrix(n)
     st = time.time()
     alc.jordan_method_py(a, b)
     return time.time() - st
@@ -215,9 +215,9 @@ def test_7_3(n):
 
 # интерполяция функции по точкам (cpython)
 def test_7_4(n):
-    x = list(range(0, n, 1))
-    y = [random.random() for _ in range(n)]
-    x_new = [i / n for i in range(n)]
+    x = np.linspace(0, n, n)
+    y = np.random.uniform(size=n)
+    x_new = np.linspace(0, n, 100 * n)
     st = time.time()
     alc.interpolate_py(x, y, x_new)
     return time.time() - st
@@ -228,7 +228,7 @@ def write_tests(name: str, tests: list, b_l, b_r, step=1, rep=5):
         file_writer = csv.writer(w_file, delimiter=",", lineterminator="\r")
 
         for i in range(b_l, b_r + 1, step):
-            print(f"{round(100 * (i - b_l) / (b_r - b_l))}%")
+            #print(f"{round(100 * (i - b_l) / (b_r - b_l))}%")
             l = [i, ]
             for f in tests:
                 t = 0
@@ -237,6 +237,7 @@ def write_tests(name: str, tests: list, b_l, b_r, step=1, rep=5):
                 t /= rep
                 l.append(t)
             file_writer.writerow(l)
+
 
 
 def mean(name, new_name):
@@ -257,11 +258,11 @@ def mean(name, new_name):
                 l3 = i
                 file_writer.writerow(l)
 
-# write_tests("data/determinant_calc.csv", [test_5_1, test_5_2, test_5_3, test_5_4], 1, 150)
+write_tests("data/determinant_calc.csv", [test_5_1, test_5_2, test_5_3, test_5_4], 1, 150)
 # write_tests("data/integration.csv", [test_6_1, test_6_2, test_6_3, test_6_4], 0, 150)
-# write_tests("data/interpolation.csv", [test_7_1, test_7_2, test_7_3, test_7_4], 2, 150)
-# write_tests("data/matrix_mul.csv", [test_1_1, test_1_2, test_1_3, test_1_4], 1, 150)
-# write_tests("data/mandelbrot_set.csv", [test_2_1, test_2_2, test_2_3], 1, 150)
-write_tests("data/find_primes.csv", [test_3_1, test_3_2, test_3_3], 1, 2000)
+# write_tests("data/interpolation.csv", [test_7_1, test_7_2, test_7_3, test_7_4], 50, 100)
+# write_tests("data/matrix_mul.csv", [test_1_1, test_1_2, test_1_3, test_1_4], 1, 100)
+# write_tests("data/mandelbrot_set.csv", [test_2_1, test_2_2, test_2_3], 1, 100)
+# write_tests("data/find_primes.csv", [test_3_1, test_3_2, test_3_3], 10000, 10100)
 # write_tests("data/jordan_method.csv", [test_4_1, test_4_2, test_4_3, test_4_4], 1, 100)
 # mean("data/find_primes_o.csv", "data/find_primes.csv")

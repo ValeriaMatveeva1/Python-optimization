@@ -10,22 +10,15 @@ from numba import njit
 
 
 def draw_m(n):
-    image = Image.open("1.png")
+    image = Image.new(mode="RGB", size=(n, n))
+
     draw = ImageDraw.Draw(image)
 
     w = image.size[0]
     h = image.size[1]
     pix = image.load()
 
-    st = time.time()
-    s = alj.mandelbrot_set(n-10)
-    print(time.time() - st)
-    st = time.time()
-    s = alj.mandelbrot_set(n-5)
-    print(time.time() - st)
-    st = time.time()
-    s = alj.mandelbrot_set(n)
-    print(time.time() - st)
+    s = alc.mandelbrot_set(n)
 
     for x in range(s.shape[0]):
         for y in range(s.shape[1]):

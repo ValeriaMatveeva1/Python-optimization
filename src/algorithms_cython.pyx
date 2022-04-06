@@ -1,16 +1,17 @@
 import math
 import random
 import numpy as np
+from libc.math cimport sin
 
-cpdef int prime_q(int n):
+cdef int prime_q(int n):
     if n <= 1:
-        return False
+        return 0
     cdef i = 2
     while i * i <= n:
         if n % i == 0:
-            return False
+            return 0
         i += 1
-    return True
+    return 1
 
 
 cpdef int[:] find_primes(int n):
@@ -21,74 +22,76 @@ cpdef int[:] find_primes(int n):
     return a
 
 
-def generate_rand_matrix(int n):
+cpdef double[:,:] generate_rand_matrix(int n):
     cdef double[:,:] a = np.random.uniform(size=(n, n))
     return a
 
 
-def matrix_mul(a: list, b: list):
-    n = len(a)
-    c: list = [[0] * n for _ in range(n)]
+cpdef double[:,:] matrix_mul(double[:,:] a, double[:,:] b):
+    cdef int n = a.shape[0]
+    cdef double[:,:] c = np.zeros((n, n))
+    cdef int i, j, k
     for i in range(n):
         for j in range(n):
             for k in range(n):
-                c[i][j] = a[i][k] * b[k][j]
+                c[i,j] = a[i,k] * b[k,j]
     return c
 
-
-def linspace(min, max, step):
-    h = (max-min)/step
-    while step:
-        yield min
-        step-=1
-        min += h
-
-
-def mandelbrot_set(wh: int):
-    pmin, pmax, qmin, qmax = -2.5, 1.5, -2, 2
-    ppoints, qpoints = wh, wh
-    max_iterations = 100
-    infinity_border = 100
-    image = [[0]*qpoints for i in range(ppoints)]
-    for ip, p in enumerate(linspace(pmin, pmax, ppoints)):
-        for iq, q in enumerate(linspace(qmin, qmax, qpoints)):
-            zx, zy = p, q
+cpdef int[:,:] mandelbrot_set(int wh):
+    cdef double pmin = -2.5
+    cdef double pmax = 1.5
+    cdef double qmin = -2
+    cdef double qmax = 2
+    cdef int max_iterations = 100
+    cdef int infinity_border = 100
+    cdef int[:,:] image = np.zeros((wh, wh), dtype=np.int32)
+    cdef int ip, iq
+    cdef double p = pmin, q = qmin, zx, zy,
+    cdef double hx = (pmax-pmin)/(wh*1.0), hy = (qmax-qmin)/(wh*1.0)
+    for ip in range(wh):
+        q = qmin
+        for iq in range(wh):
+            zx = p
+            zy = q
             for k in range(max_iterations):
                 zx, zy = zx ** 2 - zy ** 2 + p, 2 * zx * zy + q
                 if zx ** 2 + zy ** 2 > infinity_border:
-                    image[ip][iq] = k
+                    image[ip,iq] = k
                     break
+            q += hy
+        p += hx
     return image
 
 
-def jordan_method_py(a: list, f: list):
-    n = len(a)
-    for i in range(0, n):
+cpdef double[:,:] jordan_method_py(double[:,:] a, double[:,:] f):
+    cdef int n = a.shape[0]
+    cdef int i, j, k
+    for i in range(n):
         k = i
         for j in range(i + 1, n):
-            if abs(a[j][i]) > abs(a[k][i]):
+            if abs(a[j,i]) > abs(a[k,i]):
                 k = j
-        if abs(a[k][i]) < 10E-9:
-            return
+        if abs(a[k,i]) < 10E-9:
+            return f
         for j in range(n):
-            a[k][j], a[i][j] = a[i][j], a[k][j]
-            f[k][j], f[i][j] = f[i][j], f[k][j]
+            a[k,j], a[i,j] = a[i,j], a[k,j]
+            f[k,j], f[i,j] = f[i,j], f[k,j]
         for j in range(n):
-            f[i][j] /= a[i][i]
+            f[i,j] /= a[i,i]
         for j in range(n - 1, -1, -1):
-            a[i][j] /= a[i][i]
+            a[i,j] /= a[i,i]
 
         for j in range(i + 1, n):
             for t in range(n):
-                f[j][t] -= f[i][t] * a[j][i]
+                f[j,t] -= f[i,t] * a[j,i]
             for t in range(n - 1, i - 1, -1):
-                a[j][t] -= a[i][t] * a[j][i]
+                a[j,t] -= a[i,t] * a[j,i]
         for j in range(i - 1, -1, -1):
             for t in range(n):
-                f[j][t] -= f[i][t] * a[j][i]
+                f[j,t] -= f[i,t] * a[j,i]
             for t in range(n - 1, i - 1, -1):
-                a[j][t] -= a[i][t] * a[j][i]
-
+                a[j,t] -= a[i,t] * a[j,i]
+    return f
 
 cpdef double determinant(double[:,:] A) except? 0:
     cdef double eps = 1e-9
@@ -115,19 +118,27 @@ cpdef double determinant(double[:,:] A) except? 0:
     return det
 
 
-def integrate_py(a: float, b: float):
-    n = 500000
-    h = (b - a) / float(n)
-    total = sum(math.sin((a + (k * h))) for k in range(0, n))
-    result = h * total
+cpdef double integrate_py(double a, double b):
+    cdef int n = 500000
+    cdef double h0 = (b - a) / (n*1.0)
+    cdef double h = h0
+    cdef double total = 0
+    cdef int i
+    for i in range(n):
+        total += sin(a + h)
+        h += h0
+    result = h0 * total
     return result
 
 
-def interpolate_in_point(x: list, y: list, t: int):
-    z = 0
+cdef double interpolate_in_point(double[:] x, double[:] y, double t):
+    cdef double z = 0
+    cdef int i, j
+    cdef double p1
+    cdef double p2
     for j in range(len(y)):
-        p1 = 1
-        p2 = 1
+        p1 = 1.0
+        p2 = 1.0
         for i in range(len(x)):
             if i == j:
                 p1 = p1 * 1
@@ -139,5 +150,10 @@ def interpolate_in_point(x: list, y: list, t: int):
     return z
 
 
-def interpolate_py(x: list, y: list, x_new: list):
-    return [interpolate_in_point(x, y, i) for i in x_new]
+cpdef double[:] interpolate_py(double[:] x, double[:] y, double[:] x_new):
+    cdef int n = x_new.shape[0]
+    cdef double[:] res = np.zeros(n)
+    cdef int i
+    for i in range(n):
+        res[i] = interpolate_in_point(x, y, x_new[i])
+    return res
